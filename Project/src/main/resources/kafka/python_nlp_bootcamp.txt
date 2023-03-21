@@ -1,0 +1,462 @@
+conda activate nlp_course
+pip install twython
+Spacy library
+NLTK-Natural language toolkit
+Scikit machine learning package for python with ML algorithms built into it
+
+1)
+name="Saurabh"
+print (f"My name is {name}")
+//dictionary
+2)
+d = {'a':123,'b':456}
+print(f"Address is {d['a']}")
+
+//list
+3)
+mylist=[124,"Fred"]
+print(f"Address is {mylist[1]}")
+
+4)List of tuples
+library = [('Author', 'Topic', 'Pages'), ('Twain', 'Rafting', 601), ('Feynman', 'Physics', 95), ('Hamilton', 'Mythology', 144)]
+for book in library :
+    print(f"Author is {book[0]} and topic is {book[1]}")
+
+for author,topic,pages in library :
+    print(f"Author is {author} and topic is {topic}")
+
+Table formatting
+
+for author,topic,pages in library :
+    print(f"{author} {topic} {pages}")
+
+Author Topic Pages
+Twain Rafting 601
+Feynman Physics 95
+Hamilton Mythology 144
+
+for author,topic,pages in library :
+    print(f"{author:{10}} {topic:{30}} {pages:{10}}")
+
+Author     Topic                          Pages
+Twain      Rafting                               601
+Feynman    Physics                                95
+Hamilton   Mythology                             144
+(min space 10, formatting gets messed because of the integer--->right align, string left aligj)
+
+for author,topic,pages in library :
+    print(f"{author:{10}} {topic:{30}} {pages:>{10}}")
+
+    Author     Topic                               Pages
+    Twain      Rafting                               601
+    Feynman    Physics                                95
+    Hamilton   Mythology                             144
+
+for author,topic,pages in library :
+    print(f"{author:{10}} {topic:{30}} {pages:.>{10}}")
+
+Author     Topic                          .....Pages
+Twain      Rafting                        .......601
+Feynman    Physics                        ........95
+Hamilton   Mythology                      .......144
+
+5)
+from datetime import datetime
+today=datetime(year=2019, month=2, day=28)
+print(f"{today}")
+
+2019-02-28 00:00:00
+
+Use
+https://strftime.org/
+
+print(f"{today:%B %d, %Y}")
+February 28, 2019
+
+
+
+Spacy
+Open Source natural language processing library for python
+Designed to handle NLP tasks with the most efficent implemntation
+of common algorithms
+Spacy only has one option to choose an algorithm from..most efficient algorithm
+
+NLTK
+Natural language toolkit(older)
+Slower than spacy
+More functionalities less implementation
+Spacy does not have pre created models for sentiment analysis
+
+
+How to program computers to analyze and process large amounts of natural language data
+Eg classify email as spam vs legitimate
+Sentiment analysis of text movie reviews
+Analyze trends from written customer feedback forms
+Understanding text commands
+
+Spacy works with a pipeline object
+//spacy is advanced
+import spacy
+//loading a model
+nlp=spacy.load('en_core_web_sm')
+//u is for unicode string
+//doc object
+doc=nlp(u'Tesla is looking to buy a U.S startup for $6 million')
+for token in doc:
+    print(f'{token.text},{token.pos}')
+for token in doc:
+    print(f'{token.text},{token.pos_},{token.dep_}')
+
+ Tesla,PROPN,nsubj
+ is,VERB,aux
+ looking,VERB,ROOT
+ to,PART,aux
+ buy,VERB,xcomp
+ a,DET,det
+ U.S,PROPN,compound
+ startup,NOUN,dobj
+ for,ADP,prep
+ $,SYM,quantmod
+ 6,NUM,compound
+ million,NUM,pobj
+
+for token in doc:
+    print(token.text,end=' | ')
+Tesla | is | looking | to | buy | a | U.S | startup | for | $ | 6 | million |
+
+//What is nlp made of
+nlp.pipeline
+[('tagger', <spacy.pipeline.Tagger at 0x1ba0cca64c8>),
+ ('parser', <spacy.pipeline.DependencyParser at 0x1ba0cca43a8>),
+ ('ner', <spacy.pipeline.EntityRecognizer at 0x1ba0cca4948>)]
+
+
+ //POS tags
+ https://spacy.io/api/data-formats#pos-tagging
+ https://downloads.cs.stanford.edu/nlp/software/dependencies_manual.pdf
+
+ doc3 = nlp(u'Although commmonly attributed to John Lennon from his song "Beautiful Boy", \
+ the phrase "Life is what happens to us while we are making other plans" was written by \
+ cartoonist Allen Saunders and published in Reader\'s Digest in 1957, when Lennon was 17.')
+ life_quote=doc3[16:30]
+ print({life_quote})
+ type(life_quote)
+ spacy.tokens.span.Span
+ type(doc)
+ spacy.tokens.doc.Doc
+ type(doc3[0])
+ spacy.tokens.token.Token
+ for sentence in doc4.sents:
+     print({sentence});
+ {This is the first sentence.}
+ {This is another sentence.}
+ {This is the last sentence.}
+
+ doc4[6].is_sent_start
+ True
+len(doc4)
+17
+Tokenization is process of breaking original text into pieces
+doc4='test' //Cannot do reassignment for doc object
+
+//entity recognition
+doc=nlp(u'Tesla is looking to buy a U.S startup for $6 million')
+for entity in doc.ents:
+    print(entity, entity.label_ ,str(spacy.explain(entity.label_)))
+U.S GPE Countries, cities, states
+$6 million MONEY Monetary values, including unit
+
+//noun chunks
+doc9 = nlp(u"Autonomous cars shift insurance liability toward manufacturers.")
+
+for chunk in doc9.noun_chunks:
+    print(chunk.text)
+ Autonomous cars
+ insurance liability
+ manufacturers
+
+
+ Semntiment Analysis
+ Word2vec is a 2 layer neural net that processes text
+ Input is a text corpus and output is a set of vectors
+ Purpose and usefulness of word2vec is to group the vectors of similar words together
+ in the vector space..detects similarities mathematically (based on past experience)
+ it does so without human intervention
+ Guess a word's meaning based on past experiences
+ CBOW, SkipGram?
+ Each word is represented a vector, each vector has 300 dimensions in spacy
+ Training autoencoder... by yourself then you can choose betwee 100-1000 dimensions
+ Using cosine similarity to find how words are similar to each other
+ Can perform arithmetic operation on new vectors..
+ walking is to walk what swimming is to swim
+
+5.1) Similarity
+ import spacy
+ nlp=spacy.load('en_core_web_lg')
+ nlp(u'lion').vector
+ nlp(u'Make America great again').vector.shape
+ 300
+ The doc also has 300 dimensions which is the average of all the individual dimensions of the words in the doc
+
+ tokens=nlp(u'lion cat pet')
+ for token1 in tokens:
+     for token2 in tokens:
+         print(token1.text, token2.text, token1.similarity(token2))
+ lion lion 1.0
+ lion cat 0.52654374
+ lion pet 0.39923766
+ cat lion 0.52654374
+ cat cat 1.0
+ cat pet 0.7505456
+ pet lion 0.39923766
+ pet cat 0.7505456
+ pet pet 1.0
+
+5.2) Vector Norm( sum of square of all 300 dimensions, difficult to interpret)
+Outside of vocabulary(oov)
+len(nlp.vocab.vectors)
+684831 words in our library(vocabulary)
+nlp.vocab.vectors.shape
+(684831, 300)
+
+tokens=nlp(u'dog cat Saurabh Somya')
+for token3 in tokens:
+    print(token3.text,token3.has_vector,token3.vector_norm,token3.is_oov,token3)
+    dog True 7.0336733 False dog
+    cat True 6.6808186 False cat
+    Saurabh True 6.613026 False Saurabh
+    Somya False 0.0 True Somya
+
+for entity in tokens.ents:
+    print(entity, entity.label_ ,str(spacy.explain(entity.label_)))
+
+ Saurabh Somya PERSON People, including fictional
+
+5.3)Arithmetic operations on word vectors
+from scipy import spatial
+cosine_similarity=lambda vec1,vec2: 1- spatial.distance.cosine(vec1,vec2)
+
+from scipy import spatial
+cosine_similarity=lambda vec1,vec2: 1- spatial.distance.cosine(vec1,vec2)
+
+new_vector=king-man+woman
+computed_similarities=[]
+for word in nlp.vocab:
+    if word.has_vector:
+        if word.is_lower:
+            if word.is_alpha:
+                similarity=cosine_similarity(new_vector,word.vector)
+                computed_similarities.append((word,similarity))
+
+#sorting
+computed_similarities=sorted(computed_similarities,key=lambda item:-item[1])
+
+print([t[0].text for t in computed_similarities[:10]])
+['king', 'queen', 'prince', 'kings', 'princess', 'royal', 'throne', 'queens', 'monarch', 'kingdom']
+#even removing king didnt affect vector much
+
+Vader sentiment analysis with Python and NLTK
+Raw text to determine the sentiment
+Vader is a model stands for: valence aware dictionary for sentiment reasoning
+model used for text sentiment analysis that is sensitive to both polarity and intensity
+available in NLTK package and can be applied directly to unlabeled text data
+
+Vader relies on dictionary that maps lexical features to emotion intensities
+called sentiment scores
+
+Sentiment score can be obtained by summing the intensity of each word in the text
+did not love is taken as a negative sentiment... capital and punctuation is taken into account
+Challenges
+(1) Positive and negative review in the same data-->Maybe great actor but poor script
+(2)Sarcasm using positive words in negative way
+
+pip install twython
+import nltk
+nltk.download('vader_lexicon')
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+sid= SentimentIntensityAnalyzer()
+a="This is a nice movie"
+sid.polarity_scores(a)
+#result
+{'neg': 0.0, 'neu': 0.517, 'pos': 0.483, 'compound': 0.4215}
+
+a="This was the best, most awesome movie EVER MADE!!!"
+sid.polarity_scores(a)
+{'neg': 0.0, 'neu': 0.425, 'pos': 0.575, 'compound': 0.8877}
+#compound score is the net score
+
+a="This was the WORST movie that has ever disgraced the planet"
+sid.polarity_scores(a)
+{'neg': 0.465, 'neu': 0.535, 'pos': 0.0, 'compound': -0.8331}
+
+import pandas as pd
+df=pd.read_csv('amazonreviews.tsv', sep='\t')
+df.head()
+	label	review
+0	pos	Stuning even for the non-gamer: This sound tra...
+1	pos	The best soundtrack ever to anything.: I'm rea...
+2	pos	Amazing!: This soundtrack is my favorite music...
+3	pos	Excellent Soundtrack: I truly like this soundt...
+4	pos	Remember, Pull Your Jaw Off The Floor After He...
+df['label'].value_counts()
+#drop everything thats missing
+df.dropna(inplace=True)
+//drop reviews with only spaces
+blanks=[]
+for idx,lb,rv in df.itertuples():
+    if type(rv)==str:
+        if rv.isspace():
+            blanks.append(idx)
+
+df.drop(blanks,inplace=True)
+
+#returns first record
+df.iloc[0]
+#tuple syntax
+sid.polarity_scores(df.iloc[0]['review'])
+{'neg': 0.088, 'neu': 0.669, 'pos': 0.243, 'compound': 0.9454}
+#lamda input:output
+#appending to a data frame
+df['scores']=df['review'].apply(lambda review:sid.polarity_scores(review))
+df['compound']=df['scores'].apply(lambda scores:scores['compound'])
+df.head()
+
+label	review	scores	compound
+0	pos	Stuning even for the non-gamer: This sound tra...	{'neg': 0.088, 'neu': 0.669, 'pos': 0.243, 'co...	0.9454
+1	pos	The best soundtrack ever to anything.: I'm rea...	{'neg': 0.018, 'neu': 0.837, 'pos': 0.145, 'co...	0.8957
+2	pos	Amazing!: This soundtrack is my favorite music...	{'neg': 0.04, 'neu': 0.692, 'pos': 0.268, 'com...	0.9858
+3	pos	Excellent Soundtrack: I truly like this soundt...	{'neg': 0.09, 'neu': 0.615, 'pos': 0.295, 'com...	0.9814
+4	pos	Remember, Pull Your Jaw Off The Floor After He...	{'neg': 0.0, 'neu': 0.746, 'pos': 0.254, 'comp...	0.9781
+
+df['comp_score']=df['compound'].apply(lambda score:'pos' if score>=0 else 'neg')
+df['comp_score'].value_counts()
+
+from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
+accuracy_score(df['label'],df['comp_score'])
+0.7091
+
+print(classification_report(df['label'],df['comp_score']))
+precision    recall  f1-score   support
+
+         neg       0.86      0.51      0.64      5097
+         pos       0.64      0.91      0.75      4903
+
+   micro avg       0.71      0.71      0.71     10000
+   macro avg       0.75      0.71      0.70     10000
+weighted avg       0.75      0.71      0.70     10000
+
+print(confusion_matrix(df['label'],df['comp_score']))
+[[2623 2474]
+ [ 435 4468]]
+
+ df.count()
+ df['label'].value_counts()
+
+SECTION 5: Machine learning
+
+Machine learning is a method of data analysis that automates analytical model building
+ Supervised learning -> trained using labeled examples where desired output is known
+ we are dealing with historical information that we already have the labels for
+ For eg-> spam vs legitimate email, positive vs negative review
+Historical data predicts likely future events
+Classification comes udner supervised learning
+Data Acq->Data Cleaning->Split data training(70%) and test set -> Model fitting (tweak/edit/adjust parameters)->test
+model data--> deploy model
+Label(o/p) vs features
+2) Classification metrics.. accuracy, recall, precision, f1 score
+Accuracy= no of correct predictions done by our model/total no of predictions
+
+Accuracy is useful when training data(target classes) are well balanced
+same number of ham as spam
+(true positive+true negative)/total sample
+Recall: Ability of the model to find all relevant cases within a dataset
+number of true positives/(number of true positives+number of false negatives)
+
+Precision: ability of data model to identify only relevant data points
+number of true positives/(number of true positives+number of false positives)
+
+FP type 1 error
+FN type 2 error
+
+Trade off between recall and precision
+F1 score= harmonic mean of precision and recall
+2*precision*recall/(precision+recall)
+harmonic mean to punish ex
+
+Explain it like fishing with a net. You use a wide net, and catch 80 of 100 total fish in a lake.
+That’s 80% recall.But you also get 80 rocks in your net.
+That means 50% precision, half of the net’s contents is junk.
+
+You could use a smaller net and target one pocket of the lake where there are lots of fish and no rocks,
+ but you might only get 20 of the fish in order to get 0 rocks. That is 20% recall and 100% precision
+100% Precision: No false positives, every positive prediction is correct.
+if someone does not has covid, he is not predicted as covid positive
+
+
+100% Recall: No false negatives, every negative prediction is correct.
+it should not happen that a person has covid and model is not predicting it
+
+Every algorithm is exposed in scikit learn via an estimator(model)
+
+ModelCreation
+df=pd.read_csv('smsspamcollection.tsv',sep='\t')
+df.isnull().sum()
+#true then 0, false then 1..sum will add
+len(df)
+from sklearn.model_selection import train_test_split
+X=df[['length','punct']]
+y=df['label']
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3,random_state=42)
+X_train.shape
+(3900, 2)
+from sklearn.linear_model import LogisticRegression
+lr_model=LogisticRegression()
+#use shift tab to see lib and list of options just like java doc
+#tab works just like linux
+lr_model=LogisticRegression(solver='lbfgs')
+lr_model.fit(X_train,y_train)
+
+from sklearn import metrics
+predictions=lr_model.predict(X_test)
+predictions
+print(metrics.confusion_matrix(y_test,predictions))
+[[1404   44]
+ [ 219    5]]
+ df = pd.DataFrame(metrics.confusion_matrix(y_test,predictions), index=['ham','spam'], columns=['ham','spam'])
+  precision    recall  f1-score   support
+
+          ham       0.87      0.97      0.91      1448
+         spam       0.10      0.02      0.04       224
+
+    micro avg       0.84      0.84      0.84      1672
+    macro avg       0.48      0.50      0.48      1672
+ weighted avg       0.76      0.84      0.80      1672
+#accuracy
+ print(metrics.accuracy_score(y_test,predictions))
+ 0.8427033492822966
+from sklearn.naive_bayes import MultinomialNB
+model_nb= MultinomialNB()
+model_nb.fit(X_train,y_train)
+predictions=model_nb.predict(X_test)
+df = pd.DataFrame(metrics.confusion_matrix(y_test,predictions), index=['ham','spam'], columns=['ham','spam'])
+	ham	spam
+ham	1438	10
+spam	224	0
+print(metrics.classification_report(y_test,predictions))
+precision    recall  f1-score   support
+
+         ham       0.87      0.99      0.92      1448
+        spam       0.00      0.00      0.00       224
+
+   micro avg       0.86      0.86      0.86      1672
+   macro avg       0.43      0.50      0.46      1672
+weighted avg       0.75      0.86      0.80      1672
+#svc_model
+from sklearn.svm import SVC
+svc_model= SVC(gamma='auto')
+svc_model.fit(X_train,y_train)
+predictions=svc_model.predict(X_test)
+predictions
+df = pd.DataFrame(metrics.confusion_matrix(y_test,predictions), index=['ham','spam'], columns=['ham','spam'])
+print(metrics.classification_report(y_test,predictions))
+ print(metrics.accuracy_score(y_test,predictions))

@@ -1,0 +1,18 @@
+1) spark RDD (resilient distributed dataset) ->data that we are working with2) spark SQL3) spark ML4) spark with streaming scenarios( real time)
+Spark allows us to process data in a highly parallel fashion..ideal for big datasets
+Hadoop --needed a map reduce
+map reduce... written on disk before next map reduceSpark can run 100 times faster...(in memory) and 10x faster on diskSpark defines in comparison with Hadoop map reduce
+80 high level operators just map reduceBuilds an execution planIt can perform clever optimizationsIt will run whatever you can on parallel
+Can use spark on a relatively small data set in multi threaded environment on a single node... multi core parallel processing
+Dangerous and difficult in java
+ArchitectureS3, or HDFS (dont use map reduce)
+Driver->will send functions to worker nodesSort will be applied to each partition..as may parallel threadsPartition->block of dataWorker nodes-->ever nodeTask->A java code that is executing on partition
+You are building a data execution plan,, rdd is constructed only during result(datasets is built only end)you are asking to build a DAG
+Spark is built in scala. Spark does not work on java 9
+-----------------------------------------------------
+Spark core, Spark SQL, hdfs
+setAppName, setMaster/// local * use all available cores in the machine to run the program.. without it would run on a single threadUsing spark in local conf ..not in a cluster.. 
+JavaSparkContext ..connection to a spark clusterLoad into RDD
+
+Suck in a file from S3, HDFS
+Load a file.. we use parallelize and turn into RDD
