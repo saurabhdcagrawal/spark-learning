@@ -1,18 +1,358 @@
-1) spark RDD (resilient distributed dataset) ->data that we are working with2) spark SQL3) spark ML4) spark with streaming scenarios( real time)
-Spark allows us to process data in a highly parallel fashion..ideal for big datasets
-Hadoop --needed a map reduce
-map reduce... written on disk before next map reduceSpark can run 100 times faster...(in memory) and 10x faster on diskSpark defines in comparison with Hadoop map reduce
-80 high level operators just map reduceBuilds an execution planIt can perform clever optimizationsIt will run whatever you can on parallel
-Can use spark on a relatively small data set in multi threaded environment on a single node... multi core parallel processing
-Dangerous and difficult in java
-ArchitectureS3, or HDFS (dont use map reduce)
-Driver->will send functions to worker nodesSort will be applied to each partition..as may parallel threadsPartition->block of dataWorker nodes-->ever nodeTask->A java code that is executing on partition
-You are building a data execution plan,, rdd is constructed only during result(datasets is built only end)you are asking to build a DAG
-Spark is built in scala. Spark does not work on java 9
+spark->large data sets-> used in big data and data science in general
+Different modules
+	1) spark RDD (resilient distributed dataset) 
+		->data that we are working with 
+		->oldest way of working with spark'
+		->very powerful and deep
+	2) spark SQL & dataframes API (work using a much more intuitve programming model than Spark Rdd, focus more on data science and work less about the code)
+	3) spark ML(machine learning case studies)
+	4) spark with streaming scenarios( real time)-> spark in streaming applications->real time streams of data->kafka works brilliantly with spark
+
+Spark does not support java 9?	
+	Spark is a parallel execution framework that enables to us perform operations on big datasets in a highly parallel fashion
+	Hadoop 
+		--needed a map reduce->rigid problem
+		--may need chaining of map reduce;with map reduce results have to be written on disk before next map reduce-->affects peformance
+		--Spark program can run 100 times faster...(than hadoop reduce) and 10x faster on disk
+		--Spark defines in comparison with Hadoop map reduce
+		--80 high level operators than just map reduce
+		--Rather than stupidly doing one task after the another it builds an execution plan (build a graph representing the work we want to do)
+		-- Only when we are ready to get data results we want spark will run that execution plan 
+		--It can perform clever optimizations.
+		--It will run whatever you can on parallel(execution engine will find parts that are independent to run and will run it in parallel during run time)
+	Can use spark on a relatively small data set in multi threaded environment on a single node... multi core parallel processing
+		--In local computer it will run on a stand alone mode on all processors(full benefits of multi core parallel processing without having to think too deeply about
+		threading which is dangerous and difficult in java
+
+Architecture
+	Code is uploaded to the driver node or the master node
+	Driver node will build execution plan
+	Driver->will send functions to worker nodes (seperate computers)
+	HDFS still used (not map reduce) or sometimes Amazon S3
+	Data will be distributed across worker nodes and also will be partitioned(block of data).. a node will have multiple partitions deployed to it
+	(there is a partioning scheme)
+	Driver will send functions to worker nodes that need to be executed against this data,,the functions will be executed against the partitions
+	For eg if its sort, Sort will be applied to each partition.it will use as many parallel threads of execution as it has available to it
+	Task->A java code that is executing on partition
+	If data within a partition or a node is lost..it can be recovered or recreated thats why resilient distributed dataset
+	Worker Node->Multiple partitions
+	You are building a data execution plan,, rdd is constructed only during result(datasets is built only end)-->several RDD's
+	you are asking to build a DAG (execution plan)
+	Spark will execute in end
+	Code for creating new RDD are build blocks.. on execution plan 
+
+Spark is built in scala. Spark does not work on java 9..but also on python
+Uses Java 8 lambdas
+Spark 3 supports java 9+
 -----------------------------------------------------
 Spark core, Spark SQL, hdfs
-setAppName, setMaster/// local * use all available cores in the machine to run the program.. without it would run on a single threadUsing spark in local conf ..not in a cluster.. 
-JavaSparkContext ..connection to a spark clusterLoad into RDD
+    SparkConf conf= new SparkConf().setAppName("startingSpark").setMaster("local[*]");
+	JavaSparkContext sc= new JavaSparkContext(conf);
+	JavaRDD<Integer> myRDD= sc.parallelize(inputDataTwo);
 
-Suck in a file from S3, HDFS
+	setAppName, setMaster
+	/// run in a local setting, use all available cores in the machine to run the program.. without it would run on a single threadUsing spark in local conf ..not in a cluster.. 
+	JavaSparkContext ..connection to a spark clusterLoad into RDD
+	JavaRDD bridge the gap between Java and scala(Java RDD under the hood is communication with scala RDD)
+
+Reduction in RDD's--> reduced all values to 1 value..
+	Use case: addition
+	They will happen on one node
+	Double resultOne=myRDD.reduce((a,b)->a+b);
+	Java RDD's are immutable?
+
+Mapping
+	Use case: Square root
+	Applying function to every value
+	Map transformation from one type of RDD to another
+		
+	Suck in a file from S3, HDFS
 Load a file.. we use parallelize and turn into RDD
+	
+Spark ML
+	Ask spark to analyze our data and create a mathematical formula from it
+	This formula will be a good way to represent our data	
+	If it is then we will able to use it to make predictions about future values or to inform decisions	
+	Using statistical techniques to model our data
+	Spark is one of the frameworks we can use... by using spark we can analyze big data sets efficiently
+	kaggle is a website with huge number of datsets
+	Outcome we are try to predict is called label
+	Variable that might be potential predictors of this label is called features of the model
+	Linear Regression--> values we predict have wide range of possible answers(continuos)
+	Logistic Regression ->yes or no type of result..will a loan be repaid or not
+	Decision Trees-->Generate a flow chart to guide the decision making process when there are small or fixed numbers of possible outcomes
+	For example, we might want to split our customers into groups based on their profitability of high,medium or low.
+	A decision tree will let us work out the correct group for each customer.
+	
+Unsupervised Learning
+	We don't know anything about outcome but we are trying to find
+	and relationships between the entities in our data
+	Typically, we'll look to group the data into segments based on the attributes contained within it,rather than our assumptions and existing knowledge.
+	Recommender systems: K means clustering(grouping based on attributes), Matrix Factorization	(doesnt depend on the attribute of products that we are recommending 
+	rather than attributes of our customers) -- Customers who like product X also like product Y
+		
+Model fitting
+	The process of taking a data and using it to build our model is known as fitting the model	
+		
+Model building process
+	1)Choose the right model for the issue you are trying to solve (linear regression, k means)
+	2)Select the correct input data to go into model(Not all data will be necessary relevant)
+	3)Prepare the data to put it into the right format (Most of effort)
+	4)Model fitting parameters?Later
+	5)Fit the model
+	6)Evaluate the model	
+	
+Linear Regression with spark	
+	Y=B0+B1x1+B2x2+B3X3+..
+	x1,x2,x3 are features.	
+	B0 intercept for our model (Not every model has an intercept)
+	B1,B2,Bn are called model coefficients
+	Plot label vs feature (one at a time).. cannot create a graph with 3 or more features which is easy to view
+
+Spark ML pom version should match spark Core and spark SQL	
+	For Spark you can use Spark RDD(machine learning RDD is going to be deprecated) or SparkSQL, thats why the SparkML documentation has 2 parts for each of these	
+	SparkSession spark = SparkSession.builder().appName("testingSQL").master("local[*]").config("spark.sql.warehouse.dir", "file:///c:/tmp/").getOrCreate();
+	System.setProperty("hadoop.home.dir", "c:/users/*****/hadoop");
+	Logger.getLogger("org.apache").setLevel(Level.WARN);
+	Spark SQL row
+		Dataset<Row> dataset = spark.read().option("header", true).option("inferSchema", true)
+			.csv("project/src/main/resources/ml/GymCompetition.csv");	
+	Just see if file is loaded correctly
+		dataset.show()	
+	See the schema
+		dataset.printSchema()
+	Forget about non numeric types for now		
+	Data needs to be in a format to be fed to Spark ML supervised learning algorithms
+		2 columns one called label one called features..label must be numeric and should be number that we want to predict
+		the features should be an array of the values we want to feed in 
+		label 		 | features
+		55(reps)     {23,180,88}(age,height,weight)
+		Actually its not an array but a special spark data type called a vector..
+		This is a spark vector not the same as Java vector
+		We can think of it as an array
+		We are going to create this vector using a helper object called VectorAssembler
+		Set property, first property is the input columns , thats going to be an array of strings, each string being the name of the column in dataset (features)
+		Second property is the output column..name it as features
+		Some of parameters would be good predictors but others not necessarily. Give those as input in the vector assembler	
+			VectorAssembler vectorAssembler= new VectorAssembler().setInputCols(new String[]{"Age","Height","Weight"}).setOutputCol("features");
+		Call the transform method--going to return a new data set
+				Dataset<Row> datasetWithFeatures= vectorAssembler.transform(dataset);
+		After transform we have to have label:features so use select..and then do the rename	
+			Dataset<Row> modelInputData=datasetWithFeatures.select("NoOfReps","features").withColumnRenamed("NoOfReps","label");
+		It will then show in label|feature as mentioned before
+	Each and every single value in the features should be a number
+		So we will have to do something to convert our variables of age weight height into number
+		Easiest thing is to tell spark when it reads in our csv file to infer the schema(inferSchema)
+	Show model predicted values we looked at the prediction by the model for the given set of data
+		model.transform(modelInputData).show()
+	Split data into training&Test	
+		Dataset<Row>[] trainingAndTestData=modelInputData.randomSplit(new double[]{0.8,0.2});
+        Dataset<Row> trainingData=trainingAndTestData[0];
+        Dataset<Row> testData=trainingAndTestData[1];
+        LinearRegression linearRegression= new LinearRegression();
+        LinearRegressionModel model =linearRegression.fit(trainingData);
+		System.out.println("Model has intercept "+ model.intercept()+ " and coefficients "+ model.coefficients());
+		   //model.transform(testData).show();
+	RMSE and R2 are measures
+		If RMSE is lower and R square is close to 1 then it is a pretty good model
+		System.out.println(" Training data r2"+ model.summary().r2()+
+						   " Training data rmse "+model.summary().rootMeanSquaredError()+
+						   " Test data r2"+model.evaluate(testData).r2()+
+						   " Test data rmse "+model.evaluate(testData).rootMeanSquaredError());
+	Improve model
+		Values of RMSE are high and R2 not close to 1
+		Check If the values are same for training and test data for R2 and RMSE
+			if similar then the split is correct
+		See if adding extra attributes improves the model	
+			vector of bedrooms,bathrooms,sqft_living,sqft_lot,floors,grade	
+		Setting linear regression parameters to improve the model
+			setMaxIter(10),setRegParam(0.3),setElasticNetParam(0.8)
+			LinearRegressionModel model =linearRegression.setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.8).fit(trainingData);	
+			Split data 3 ways
+			Training data, test data and holdout
+			Because the test data used multiple times it becomes part of the model building process
+			Build multiple models
+				Dataset<Row>[] dataSplits=modelInputData.randomSplit(new double[]{0.8,0.2});
+				Dataset<Row> trainingand testData=dataSplits[0];
+				Dataset<Row> holdoutData=dataSplits[1];
+				ParamGridBuilder paramGridBuilder= new ParamGridBuilder();
+				ParamMap[]  paramMap=paramGridBuilder.addGrid(linearRegression.regParam(),new double[]{0.01,0.1,0.5})
+								 .addGrid(linearRegression.elasticNetParam(),new double[]{0,0.5,1})
+								 .build();
+				TrainValidationSplit trainValidationSplit = new TrainValidationSplit()
+                .setEstimator(linearRegression)
+                .setEvaluator(new RegressionEvaluator().setMetricName("r2"))
+                .setEstimatorParamMaps(paramMap)
+                .setTrainRatio(0.8);
+				TrainValidationSplitModel model=trainValidationSplit.fit(trainingandtestData);
+			//Automatically choose the best model from our grid	
+				LinearRegressionModel lrModel=(LinearRegressionModel) model.bestModel();
+			//Get the values of regParam and netParam that were selected 	
+				System.out.println("reg Param"+lrModel.getRegParam()+" net Param "+lrModel.getElasticNetParam());
+
+Feature Selection (which attributes/features to select for building the model)
+	https://www.udemy.com/course/apache-spark-for-java-developers/learn/lecture/12441960#overview
+	Eliminate dependent variables
+		If there are any variables which are completely dependent on value we are trying to predict, remove them
+		Sales tax is a percentage of the price of the property.and we are predicting the price of the property. Remove the variable sales tax
+	Does each variable)features and label) have a sufficiently wide range of values
+		Use describe method provided by spark.Its called exploratory work
+			csvData.describe().show()
+		Analyze each variable	
+		Leave boolean,dates, grade(categorical data) to avoid using it as a number. 
+		However,We are still going to use year_built since it can be a good indicator of the price?
+			dataset=dataset.drop("id","date","waterfront","view","condition","grade","yr_renovated","zipcode","lat","long");
+	Are any variables good potential predictors? (correlation , plots we did before)	
+		Spark provides methods to calculate correlation
+			csvData.stat().corr("price","sqft_living")
+			for(String col: dataset.columns())
+				System.out.println("The correlation between price and "+col+" is "+ dataset.stat().corr("price",col));
+		Based on low correlation value drop these attributes as well while building the model		
+			dataset=dataset.drop("sqft_loop","sqft_loft15","yr_built","sqft_living15");
+	Are there any duplicate variables?
+		Either variables have duplicate data or having a strong correlation between them. 
+		Find correlation in attributes now
+			//take data and put in a table and correlation table
+			//exclude things close to 1 and close to -1
+			for(String col1: dataset.columns()){
+				for(String col2: dataset.columns()){
+					System.out.println("The correlation between "+col1 +" and "+col2 +" is " + dataset.stat().corr(col1,col2));
+				}
+			}
+		if you find high correlation between 2 variables, choose the one which has a higher correlation with the label
+		dataset.withColumn("sqft_above_percentage",col("sqft_above").divide(col("sqft_living")));
+	Data preparation
+		Acquisition
+		Cleaning
+			(1) Replace nulls with appropriate value (Spark doesnt allow any features to have null value)	
+			(2) Data missing..remove that record altogethere(system failure or data loss)
+			(3) Records are Erroneous-- eg date of birth in future, price is negative --remove
+		Feature Selection
+		Data Formatting
+	Non Numeric Data
+		Incorporate non numeric data into our model(Category data)
+			Convert category to Value vector containing bits([1,[0],[1.0]) Gender M,F,U
+			Saves space as compared to arrays?
+			examples  1st value, number of bits to represent, 2nd value position, 3rd value what distinct value in that position
+			Grade	 Array  	Vector
+				A	 [0,0,0,0]  (4,[],[])
+				B	 [1,0,0,0]	(4,[0],[1])
+				C
+				D
+				E	 [0,0,0,1]	(4,[3],[1])
+			Gender->GenderIndex->GenderVector
+			Use String Indexer
+				Automatically gives index to the values based on category
+				Dataset<Row> dataset = spark.read().option("header", true).option("inferSchema", true)
+						.csv("project/src/main/resources/ml/GymCompetition.csv");
+				//dataset.printSchema();
+				//dataset.show();
+
+				//data indexer--->non numeric model as continuos values
+				StringIndexer genderIndexer = new StringIndexer();
+				genderIndexer.setInputCol("Gender");
+				genderIndexer.setOutputCol("GenderIndex");
+				dataset = genderIndexer.fit(dataset).transform(dataset);
+				dataset.show();
+			Now make it as a vector(encoding)
+				One Hot encoder(old deprecated)..now called OneHotEncoderEstimater
+				//encoder
+				OneHotEncoder genderEncoder = new OneHotEncoder();
+				genderEncoder.setInputCols(new String[]{"GenderIndex"});
+				genderEncoder.setOutputCols(new String[]{"GenderVector"});
+				dataset = genderEncoder.fit(dataset).transform(dataset);
+				dataset.show();
+			Now use it in the model
+				VectorAssembler vectorAssembler= new VectorAssembler().setInputCols(new String[]{"Age","Height","Weight","GenderVector"}).setOutputCol("features");
+			Boolean value addd without one hot encoding??
+				Condition,grade,zipcode
+			In House Pricing data set conditionVector, gradeVector, zipcodeVector, waterfront as is (boolean value)
+				Significant improvement in model
+	Pipelines
+		Objects that we are calling transform on are called transformer objects
+			They take dataset as the i/p and return a dataset as the o/p for the objects we are calling it on
+		Estimates
+			Take dataset as the i/p and return transformer objects as the o/p
+		The idea then is that using pipelines, we're going to create a number of these pipeline stages and then combine them together in a particular order.
+		Doing that, we won't have to keep calling fit and transform for each of the underlying stages and we won't need the interim data sets that we've had to store along the way.
+        Spark will do all of that for us.	
+		
+		Steps
+		1)Create estimators and transformers
+		2)Create pipeline objects and set stages
+		3)Run fit on the pipeline
+		4)Extract the model
+		
+			
+			//--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED
+			SparkSession spark = SparkSession.builder().appName("testingSQL").master("local[*]").config("spark.sql.warehouse.dir", "file:///c:/tmp/").getOrCreate();
+			Dataset<Row> dataset = spark.read().option("header", true).option("inferSchema", true)
+					.csv("project/src/main/resources/ml/kc_house_data.csv");
+
+
+			dataset=dataset.withColumn("sqft_above_percentage",(col("sqft_above").divide(col("sqft_living"))))
+					.withColumnRenamed("price","label");
+			dataset.show();
+			dataset.printSchema();
+			dataset.describe().show();
+
+			Dataset<Row>[] dataSplits=dataset.randomSplit(new double[]{0.8,0.2});
+			Dataset<Row> trainingAndTestData=dataSplits[0];
+			Dataset<Row> holdOutData=dataSplits[1];
+
+			StringIndexer conditionIndexer = new StringIndexer();
+			conditionIndexer.setInputCol("condition");
+			conditionIndexer.setOutputCol("conditionIndex");
+
+			StringIndexer gradeIndexer = new StringIndexer();
+			gradeIndexer.setInputCol("grade");
+			gradeIndexer.setOutputCol("gradeIndex");
+
+			StringIndexer zipcodeIndexer = new StringIndexer();
+			zipcodeIndexer.setInputCol("zipcode");
+			zipcodeIndexer.setOutputCol("zipcodeIndex");
+
+			OneHotEncoder encoder = new OneHotEncoder();
+			encoder.setInputCols(new String[] {"conditionIndex","gradeIndex","zipcodeIndex"});
+			encoder.setOutputCols(new String[] {"conditionVector","gradeVector","zipcodeVector"});
+
+			VectorAssembler vectorAssembler = new VectorAssembler()
+					.setInputCols(new String[] {"bedrooms","bathrooms","sqft_living","sqft_above_percentage","floors","conditionVector","gradeVector","zipcodeVector","waterfront"})
+					.setOutputCol("features");
+
+			VectorAssembler vectorAssembler2 = new VectorAssembler()
+					.setInputCols(new String[] {"bedrooms","sqft_living","sqft_above_percentage","floors","conditionVector","gradeVector","zipcodeVector","waterfront"})
+					.setOutputCol("features");
+
+			LinearRegression linearRegression = new LinearRegression();
+
+			ParamGridBuilder paramGridBuilder = new ParamGridBuilder();
+
+			ParamMap[] paramMap = paramGridBuilder.addGrid(linearRegression.regParam(), new double[] {0.01,0.1,0.5})
+					.addGrid(linearRegression.elasticNetParam(), new double[] {0,0.5,1})
+					.build();
+
+			TrainValidationSplit trainValidationSplit = new TrainValidationSplit()
+					.setEstimator(linearRegression)
+					.setEvaluator(new RegressionEvaluator().setMetricName("r2"))
+					.setEstimatorParamMaps(paramMap)
+					.setTrainRatio(0.8);
+
+			Pipeline pipeline = new Pipeline();
+			pipeline.setStages(new PipelineStage[] {conditionIndexer,gradeIndexer,zipcodeIndexer,encoder,vectorAssembler,trainValidationSplit});
+			PipelineModel pipelineModel = pipeline.fit(trainingAndTestData);
+			TrainValidationSplitModel model = (TrainValidationSplitModel)pipelineModel.stages()[5];
+			LinearRegressionModel lrModel = (LinearRegressionModel)	model.bestModel();
+
+			Dataset<Row> holdOutResults = pipelineModel.transform(holdOutData);
+			holdOutResults.show();
+			holdOutResults = holdOutResults.drop("prediction");
+			System.out.println("Model has intercept: "+ lrModel.intercept()+ " and coefficients: "+ lrModel.coefficients());
+			//Get the values of regParam and netParam that were selected
+			System.out.println("reg Param: "+lrModel.getRegParam()+" net Param: "+lrModel.getElasticNetParam());
+
+			//model.transform(testData).show();
+			System.out.println("Training data r2:"+ lrModel.summary().r2()+" Training data rmse: "+lrModel.summary().rootMeanSquaredError());
+			System.out.println(" Test data r2:"+
+					lrModel.evaluate(holdOutResults).r2()+" Test data rmse:"+lrModel.evaluate(holdOutResults).rootMeanSquaredError());
+		

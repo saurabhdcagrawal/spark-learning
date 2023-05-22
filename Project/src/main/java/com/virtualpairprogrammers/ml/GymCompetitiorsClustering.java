@@ -4,6 +4,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.ml.feature.OneHotEncoder;
 import org.apache.spark.ml.feature.StringIndexer;
+import org.apache.spark.ml.feature.VectorAssembler;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -20,6 +21,7 @@ public class GymCompetitiorsClustering {
         //dataset.printSchema();
         //dataset.show();
 
+        /* old ways
         //data indexer--->non numeric model as continuos values
         StringIndexer genderIndexer = new StringIndexer();
         genderIndexer.setInputCol("Gender");
@@ -33,5 +35,10 @@ public class GymCompetitiorsClustering {
         genderEncoder.setOutputCols(new String[]{"GenderVector"});
         dataset = genderEncoder.fit(dataset).transform(dataset);
         dataset.show();
-        }
+
+        VectorAssembler vectorAssembler= new VectorAssembler().setInputCols(new String[]{"Age","Height","Weight","GenderVector"}).setOutputCol("features");
+
+        */
+
+    }
     }
