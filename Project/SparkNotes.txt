@@ -268,6 +268,7 @@ Feature Selection (which attributes/features to select for building the model)
 				Condition,grade,zipcode
 			In House Pricing data set conditionVector, gradeVector, zipcodeVector, waterfront as is (boolean value)
 				Significant improvement in model
+	CaseStudy--> Read the vpp code first before going to pipelines
 	Pipelines
 		Objects that we are calling transform on are called transformer objects
 			They take dataset as the i/p and return a dataset as the o/p for the objects we are calling it on
@@ -282,6 +283,7 @@ Feature Selection (which attributes/features to select for building the model)
 		2)Create pipeline objects and set stages
 		3)Run fit on the pipeline
 		4)Extract the model
+		5)Transform on holdOut data
 		
 			
 			//--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED
